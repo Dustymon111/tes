@@ -21,7 +21,7 @@ fetch('http://localhost:3000/api',{
                              <h2>Rp. ${brg.harga}.00</h2>
                              <div ="clear: both;">
                               <button id="decrement" onClick="decrement()">-</button>
-                              <input type="text" id="item-quantity" value="${brg.value}">
+                              <input type="text" id="item-quantity" value="${brg.jumlah}">
                               <button id="increment" onClick="increment()">+</button>
                              </div>
                              <div="diskondiv">
@@ -82,6 +82,20 @@ function delElement(a){
   displaycart();
 }
 
+async function decrement(id, jumlah) {
+  const response = await fetch(`localhost:3000/api/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      jumlah: jumlah
+    })
+  });
+  const data = await response.json();
+  console.log(data);
+}
+
 const decrementButton = document.getElementById("decrement");
 const incrementButton = document.getElementById("increment");
 const itemQuantity = document.getElementById("item-quantity");
@@ -104,11 +118,13 @@ function displaycart(){
   else{
     document.getElementById('cartItem').innerHTML = cart.map((item) => 
     {
-      const {image,nama,harga,diskon} = item;
+      const {image,nama,harga,diskon, jumlah} = item;
       if (diskon !== 0){
         newHarga = harga - (harga * diskon / 100);
+      }else{
+        newHarga = harga
       }
-      total=total+newHarga;
+      total=total+newHarga*jumlah;
       document.getElementById('total').innerHTML = "Rp."+total+".00";
       return(
         `<div class='cart-item'>
